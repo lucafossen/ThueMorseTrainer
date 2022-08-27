@@ -1,9 +1,11 @@
 import pygame
 from pygame.locals import Color
 
+dark_color = Color(25, 25, 0)
+
 # TODO: clean up this mess
 class Indicator:
-    def __init__(self, screen, rect, color, border_color=Color(240, 240, 240), border_width=20):#default_color, true_color, active_color, false_color, border_color, border_width):
+    def __init__(self, screen, rect, color=dark_color, border_color=dark_color, border_width=25):#default_color, true_color, active_color, false_color, border_color, border_width):
         self.screen = screen
         self.rect = rect
         self.default_color = color
