@@ -2,14 +2,6 @@
 
 from pygame.constants import MOUSEBUTTONUP
 
-#TODO:
-# - more and better comments
-# - add a restart button
-# - add a quit button
-# - improve sound responsiveness
-# - clean up the mess that is indicator.py
-# - add resize support
-
 def main():
     from pygame.constants import KEYUP, K_r#, RESIZABLE, VIDEORESIZE
     from game import Game
