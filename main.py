@@ -1,6 +1,4 @@
 # Rules of the game can be found in inverting_pattern.py
-
-from cgitb import grey
 from pygame.constants import MOUSEBUTTONUP
 
 def main():

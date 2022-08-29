@@ -38,24 +38,17 @@ class Game:
 
     global highscore
 
-    def __init__(self, iterations=13, lost=False):
-        self.steps_since_launch = steps_since_launch
-        
-        self.iterations = iterations
-        
+    def __init__(self, lost=False):
+        self.steps_since_launch = steps_since_launch        
         self.pattern_pos = 0
-
         self.milestone_pos = 0
         self.won = False
         self.lost = lost
-
         self.highscore = self.get_highscore(high_path)
-
         self.starting_action = None
         self.started = False
 
         self.dynamic_rvol = 1
-
         self.which_channel = True
         restart_sound.play()
 
@@ -132,6 +125,13 @@ class Game:
             # If the action is correct
             if {"right":1, "left":0}[action] == inverting_pattern.evaluate_move(self.pattern_pos, self.starting_action):
                 self.pattern_pos += 1
+                # Set volumes of regular beeps lower if milestone sound is also supposed to play
+                if ((self.pattern_pos) & (self.pattern_pos-1) == 0):
+                    right_sound.sound.set_volume(0.7)
+                    left_sound.sound.set_volume(0.7)
+                else:
+                    right_sound.sound.set_volume(1)
+                    left_sound.sound.set_volume(1)
                 # Play appropriate sound
                 if action == "right":
                     right_sound.play()
@@ -170,7 +170,6 @@ class Game:
                 self.correct = False
                 self.lost = True
                 self.update_highscore(self.game_time)
-
                 {"left":fail_left, "right":fail_right}[action].play()
 
         # TODO: why is this here?
