@@ -1,102 +1,49 @@
-# Rules of the game can be found in inverting_pattern.py
+import pygame
+import pygame.freetype
+import pygame.time
 from pygame.constants import MOUSEBUTTONUP
+from pygame.constants import KEYUP, K_r#, RESIZABLE, VIDEORESIZE
+from pygame.locals import K_LEFT, K_RIGHT, K_ESCAPE, KEYDOWN, QUIT, Color
+from game import Game
+from indicator import Indicator
 
-def main():
-    from pygame.constants import KEYUP, K_r#, RESIZABLE, VIDEORESIZE
-    from game import Game
-    from indicator import Indicator
-    import pygame
-    import pygame.time
-    pygame.init()
-    pygame.freetype.init()
+# Constants
+SCREEN_WIDTH = 600
+SCREEN_HEIGHT = 500
+BORDER_WIDTH = 25
+ARROW_Y = 363
+ARROW_X_PAD = 138
+TIME_ACC = 2
 
-    from pygame.locals import (
-    K_LEFT,
-    K_RIGHT,
-    K_ESCAPE,
-    KEYDOWN,
-    QUIT,
-    Color
-    )
+# Colors
+IDLE_COLOR = (220, 220, 200)
+BORDER_COLOR = (240, 240, 240)
+TRUE_COLOR = (100, 255, 59)
+MILESTONE_COLOR = (255, 209, 0)
+MILESTONE_OTHER_COLOR = (255, 232, 179)
+MILESTONE_TOP_COLOR = (255, 222, 102)
+FALSE_COLOR = (255, 0, 48)
+MORE_FALSE_COLOR = (200, 0, 10)
+FALSE_COLOR_BUTTON = (231, 155, 165)
+ACTIVE_COLOR = (165, 255, 155)
+HIGHSCORE_MENU_COLOR = (90, 60, 60)
+HIGHSCORE_COLOR = HIGHSCORE_MENU_COLOR
+TIME_COLOR = (90, 60, 60)
+ARROW_COLOR = (150, 140, 140)
 
-    screen_width = 600
-    screen_height = 500
-    screen = pygame.display.set_mode((screen_width, screen_height)) # , RESIZABLE)
-    icon = pygame.image.load("icon/icon.png")
-    pygame.display.set_icon(icon)
-    pygame.display.set_caption('Blaauw-Fossen Algogame')
-
-
-    idle_color = Color(220, 220, 200)#Color(225, 225, 225) # TODO: why is this grey?
-    border_color = Color(240, 240, 240)
-    true_color = Color(100, 255, 59)
-    milestone_color = Color(255, 209, 0)
-    milestone_other_color = Color(255, 232, 179)
-    milestone_top_color = Color(255, 222, 102)
-    false_color = Color(255, 0, 48)
-    more_false_color = Color(200, 0, 10)
-    false_color_button = Color(231, 155, 165)
-    active_color = Color(165, 255, 155)
-
-    highscore_menu_color = Color(90, 60, 60) # TODO: Rediscover why I made this variable
-    highscore_color = highscore_menu_color
-    time_color = Color(90, 60, 60)
-    # TODO: rediscover why I made these variables
-    # random_color_range = 20
-    # game_resting_color = Color(50, 225, 50)
-    # midwidth = screen_width/2+border_width/4
-
-    border_width = 25
-
-    # Arrow settings
-    arrow_y = 363
-    arrow_x_pad = 138
-    arrow_color = Color(150, 140, 140)
-
-    # TODO: this can probably be much smaller
-    # LEFT
-    left_indicator = Indicator(screen,
-    (border_width/2,
-    screen_height/2,
-    screen_width/2-(border_width/1.5+1),
-    screen_height/2-border_width/2+1))
+# Fonts
+pygame.freetype.init()
+SCORE_FONT = pygame.freetype.Font("font/Montserrat-Regular.ttf", 128)
+BUTTON_FONT = pygame.freetype.Font("font/Montserrat Regular 400.ttf", 17)
+HIGHSCORE_FONT = pygame.freetype.Font("font/Montserrat-Regular.ttf", 32)
+TUTORIAL_FONT = pygame.freetype.Font("font/Montserrat-Regular.ttf", 26)
+TIME_FONT = pygame.freetype.Font("font/Montserrat-Regular.ttf", 20)
+# ... rest of the code ...
 
 
-    # RIGHT
-    right_indicator = Indicator(screen,
-    (screen_width/2+(border_width/3+2),
-    screen_height/2,
-    screen_width/2-(border_width/3+border_width/2+1),
-    screen_height/2-border_width/2+1))
-
-    # TOP
-    game_indicator = Indicator(screen,
-    (0+border_width/2,
-    0+border_width/2,
-    screen_width-border_width,
-    screen_height/2-border_width))
-
-    # Restart
-    restart_button = Indicator(screen, (25, 150, 100, 30), (200, 190, 170), border_width=4)
-    quit_button = Indicator(screen, (25, 195, 100, 30), (200, 190, 170), border_width=4)
-
-    score_font = pygame.freetype.Font("font/Montserrat-Regular.ttf", 128)
-    button_font = pygame.freetype.Font("font/Montserrat Regular 400.ttf", 17)
-    highscore_font = pygame.freetype.Font("font/Montserrat-Regular.ttf", 32)
-    tutorial_font = pygame.freetype.Font("font/Montserrat-Regular.ttf", 26)
-    time_font = pygame.freetype.Font("font/Montserrat-Regular.ttf", 20)
-
-    # How many decimal places to show for time
-    time_acc = 2
-
-    game = Game()
-
-    clock = pygame.time.Clock()
-    running = True
-    # Main loop
-    while running:
-        # Look at every event in the queue
-        for event in pygame.event.get():
+def handle_events(game):
+    global running, left_indicator, right_indicator, game_indicator
+    for event in pygame.event.get():
             # Did the user hit a key?
             if event.type == KEYDOWN:
                 # Was it the Escape key? If so, stop the loop.
@@ -107,31 +54,31 @@ def main():
                 elif event.key == K_LEFT:
                     game.process_action("left")
                     if game.lost:
-                        left_indicator.color = false_color
+                        left_indicator.color = FALSE_COLOR
                     elif ((game.pattern_pos) & (game.pattern_pos-1) == 0):
-                        left_indicator.color = milestone_color
-                        right_indicator.color = milestone_other_color
-                        game_indicator.color = milestone_top_color
+                        left_indicator.color = MILESTONE_COLOR
+                        right_indicator.color = MILESTONE_OTHER_COLOR
+                        game_indicator.color = MILESTONE_TOP_COLOR
                     else:
-                        left_indicator.color = true_color
-                        game_indicator.color = true_color
+                        left_indicator.color = TRUE_COLOR
+                        game_indicator.color = TRUE_COLOR
                 elif event.key == K_RIGHT:
                     game.process_action("right")
                     if game.lost:
-                        right_indicator.color = false_color
+                        right_indicator.color = FALSE_COLOR
                     elif ((game.pattern_pos) & (game.pattern_pos-1) == 0):
-                        right_indicator.color = milestone_color
-                        left_indicator.color = milestone_other_color
-                        game_indicator.color = milestone_top_color
+                        right_indicator.color = MILESTONE_COLOR
+                        left_indicator.color = MILESTONE_OTHER_COLOR
+                        game_indicator.color = MILESTONE_TOP_COLOR
                     else:
-                        right_indicator.color = true_color
-                        game_indicator.color = true_color
+                        right_indicator.color = TRUE_COLOR
+                        game_indicator.color = TRUE_COLOR
 
                 if event.key == K_r:
                     game.update_highscore(game.game_time)
-                    game = Game(lost=False, )
+                    game.__init__()
                     for i in (game_indicator, left_indicator, right_indicator):
-                            i.color = active_color
+                            i.color = ACTIVE_COLOR
 
             elif event.type == KEYUP:
                 if event.key == K_LEFT and not game.lost:
@@ -148,22 +95,22 @@ def main():
                 if left_indicator.fill_rect.collidepoint(pygame.mouse.get_pos()):
                     game.process_action("left")
                     if not game.lost:
-                        left_indicator.color = true_color
-                        game_indicator.color = true_color
+                        left_indicator.color = TRUE_COLOR
+                        game_indicator.color = TRUE_COLOR
                     else:
-                        left_indicator.color=false_color
+                        left_indicator.color=FALSE_COLOR
                 elif right_indicator.fill_rect.collidepoint(pygame.mouse.get_pos()):
                     game.process_action("right")
                     if not game.lost:
-                        right_indicator.color = true_color
-                        game_indicator.color = true_color
+                        right_indicator.color = TRUE_COLOR
+                        game_indicator.color = TRUE_COLOR
                     else:
-                        right_indicator.color = false_color
+                        right_indicator.color = FALSE_COLOR
                 elif restart_button.fill_rect.collidepoint(pygame.mouse.get_pos()):
                     game.update_highscore(game.game_time)
-                    game = Game(lost=False, )
+                    game.__init__()
                     for i in (game_indicator, left_indicator, right_indicator):
-                            i.color = active_color
+                            i.color = ACTIVE_COLOR
                 elif quit_button.fill_rect.collidepoint(pygame.mouse.get_pos()):
                     game.update_highscore(game.game_time)
                     running = False
@@ -177,73 +124,128 @@ def main():
                 game.update_highscore(game.game_time)
                 running = False
 
-        # Animation logic
+def update_game_state(game):
+    """Will be implemented in the future
+    """
+    # Update game state
+    pass
 
-        # lagcomp makes sure the colors don't drift off
-        # when moving/resizing the window
-        lagcomp = clock.get_time()
-        if lagcomp > 100:
-            lagcomp = 100
+def render(game):
+    global screen, clock, left_indicator, right_indicator, game_indicator, restart_button, quit_button, running
+    # Animation logic
 
-        if game.lost:
-            left_indicator.recolor(5*lagcomp, false_color_button)
-            right_indicator.recolor(5*lagcomp, false_color_button)
-            game_indicator.recolor(5*lagcomp, false_color)
-        else:
-            for indicator in (left_indicator, right_indicator):
-                # Button fade animation
-                if indicator.correct:
-                    indicator.recolor(0.5*lagcomp, idle_color)#, tot=1000)
-                elif indicator.correct == None:
-                    indicator.recolor(5*lagcomp, idle_color)
-                else:
-                    indicator.recolor(5*lagcomp, more_false_color)# tot=1000)
+    # lagcomp makes sure the colors don't drift off
+    # when moving/resizing the window
+    lagcomp = clock.get_time()
+    if lagcomp > 100:
+        lagcomp = 100
 
-            game_indicator.recolor(0.5*lagcomp, target=idle_color)
+    if game.lost:
+        left_indicator.recolor(5*lagcomp, FALSE_COLOR_BUTTON)
+        right_indicator.recolor(5*lagcomp, FALSE_COLOR_BUTTON)
+        game_indicator.recolor(5*lagcomp, FALSE_COLOR)
+    else:
+        for indicator in (left_indicator, right_indicator):
+            # Button fade animation
+            if indicator.correct:
+                indicator.recolor(0.5*lagcomp, IDLE_COLOR)#, tot=1000)
+            elif indicator.correct == None:
+                indicator.recolor(5*lagcomp, IDLE_COLOR)
+            else:
+                indicator.recolor(5*lagcomp, MORE_FALSE_COLOR)# tot=1000)
 
-        if game_indicator.correct != False and game.pattern_pos != 0:
-            game_indicator.recolor(5*lagcomp, target=idle_color)#, tot=900)
+        game_indicator.recolor(0.5*lagcomp, target=IDLE_COLOR)
 
-        # Lower intro volume if game is started early
-        if game.started and game.dynamic_rvol != 0:
-            game.fade_restart_volume()
+    if game_indicator.correct != False and game.pattern_pos != 0:
+        game_indicator.recolor(5*lagcomp, target=IDLE_COLOR)#, tot=900)
 
-        game_indicator.draw()
-        left_indicator.draw()
-        right_indicator.draw()
+    # Lower intro volume if game is started early
+    if game.started and game.dynamic_rvol != 0:
+        game.fade_restart_volume()
 
-        # Drawing paddle arrows (Should i make a function for this?)
-        if not game.started:
-            #left arrow
-            pygame.draw.line(screen, arrow_color, (arrow_x_pad-25, arrow_y), (arrow_x_pad, arrow_y-25), 8)
-            pygame.draw.line(screen, arrow_color, (arrow_x_pad-25, arrow_y), (arrow_x_pad, arrow_y+25), 8)
-            pygame.draw.line(screen, arrow_color, (arrow_x_pad-25, arrow_y), (arrow_x_pad+35, arrow_y), 5)
-            # right arrow
-            pygame.draw.line(screen, arrow_color, (screen_width-(arrow_x_pad-25), arrow_y), (screen_width-(arrow_x_pad), arrow_y-25), 8)
-            pygame.draw.line(screen, arrow_color, (screen_width-(arrow_x_pad-25), arrow_y), (screen_width-(arrow_x_pad), arrow_y+25), 8)
-            pygame.draw.line(screen, arrow_color, (screen_width-(arrow_x_pad-25), arrow_y), (screen_width-(arrow_x_pad+35), arrow_y), 5)
+    game_indicator.draw()
+    left_indicator.draw()
+    right_indicator.draw()
 
-        # Font renders:
-        # Game not in progress
-        if not game.in_progress:
-            # Render high score
-            if game.get_highscore() > 0:
-                highscore_font.render_to(screen, (screen_width/18, screen_height/15), f"high: {game.get_highscore()}", fgcolor=(highscore_color))
-            # Render restart and quit button
-            restart_button.draw()
-            button_font.render_to(screen, (46, 159), 'restart')
-            quit_button.draw()
-            button_font.render_to(screen, (55, 202), 'quit')
+    # Drawing paddle arrows (Should i make a function for this?)
+    if not game.started:
+        #left arrow
+        pygame.draw.line(screen, ARROW_COLOR, (ARROW_X_PAD-25, ARROW_Y), (ARROW_X_PAD, ARROW_Y-25), 8)
+        pygame.draw.line(screen, ARROW_COLOR, (ARROW_X_PAD-25, ARROW_Y), (ARROW_X_PAD, ARROW_Y+25), 8)
+        pygame.draw.line(screen, ARROW_COLOR, (ARROW_X_PAD-25, ARROW_Y), (ARROW_X_PAD+35, ARROW_Y), 5)
+        # right arrow
+        pygame.draw.line(screen, ARROW_COLOR, (SCREEN_WIDTH-(ARROW_X_PAD-25), ARROW_Y), (SCREEN_WIDTH-ARROW_X_PAD, ARROW_Y-25), 8)
+        pygame.draw.line(screen, ARROW_COLOR, (SCREEN_WIDTH-(ARROW_X_PAD-25), ARROW_Y), (SCREEN_WIDTH-ARROW_X_PAD, ARROW_Y+25), 8)
+        pygame.draw.line(screen, ARROW_COLOR, (SCREEN_WIDTH-(ARROW_X_PAD-25), ARROW_Y), (SCREEN_WIDTH-(ARROW_X_PAD+35), ARROW_Y), 5)
 
-        # After loss
-        if game.lost:
-            time_str = str(f"{round(game.game_time, time_acc)}s ({round(game.pattern_pos/game.game_time, time_acc)} bits per second)")
-            time_font.render_to(screen, (screen_width/2-time_font.get_rect(time_str)[2]/2, screen_height/2.42), time_str, fgcolor=(time_color))
-            tutorial_font.render_to(screen, (screen_width/2-tutorial_font.get_rect("r to restart")[2]/2, screen_height/2.88), "r to restart")
-        score_font.render_to(screen, (screen_width/2-score_font.get_rect(str(game.pattern_pos))[2]/2, screen_height/10), str(game.pattern_pos))
+    # Font renders:
+    # Game not in progress
+    if not game.in_progress:
+        # Render high score
+        if game.get_highscore() > 0:
+            HIGHSCORE_FONT.render_to(screen, (SCREEN_WIDTH/18, SCREEN_HEIGHT/15), f"high: {game.get_highscore()}", fgcolor=HIGHSCORE_COLOR)
+        # Render restart and quit button
+        restart_button.draw()
+        BUTTON_FONT.render_to(screen, (46, 159), 'restart')
+        quit_button.draw()
+        BUTTON_FONT.render_to(screen, (55, 202), 'quit')
 
-        pygame.display.update()
-        clock.tick_busy_loop()
+    # After loss
+    if game.lost:
+        time_str = str(f"{round(game.game_time, TIME_ACC)}s ({round(game.pattern_pos/game.game_time, TIME_ACC)} bits per second)")
+        TIME_FONT.render_to(screen, (SCREEN_WIDTH/2-TIME_FONT.get_rect(time_str)[2]/2, SCREEN_HEIGHT/2.42), time_str, fgcolor=TIME_COLOR)
+        TUTORIAL_FONT.render_to(screen, (SCREEN_WIDTH/2-TUTORIAL_FONT.get_rect("r to restart")[2]/2, SCREEN_HEIGHT/2.88), "r to restart")
+    SCORE_FONT.render_to(screen, (SCREEN_WIDTH/2-SCORE_FONT.get_rect(str(game.pattern_pos))[2]/2, SCREEN_HEIGHT/10), str(game.pattern_pos))
+
+    pygame.display.update()
+    clock.tick_busy_loop()
+
+def main():
+    global screen, clock, left_indicator, right_indicator, game_indicator, restart_button, quit_button, running
+    pygame.init()
+
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT)) # , RESIZABLE)
+    icon = pygame.image.load("icon/icon.png")
+    pygame.display.set_icon(icon)
+    pygame.display.set_caption('Thue Morse Trainer')
+
+    # TODO: this can probably be much smaller
+    # LEFT
+    left_indicator = Indicator(screen,
+    (BORDER_WIDTH/2,
+    SCREEN_HEIGHT/2,
+    SCREEN_WIDTH/2-(BORDER_WIDTH/1.5+1),
+    SCREEN_HEIGHT/2-BORDER_WIDTH/2+1))
+
+
+    # RIGHT
+    right_indicator = Indicator(screen,
+    (SCREEN_WIDTH/2+(BORDER_WIDTH/3+2),
+    SCREEN_HEIGHT/2,
+    SCREEN_WIDTH/2-(BORDER_WIDTH/3+BORDER_WIDTH/2+1),
+    SCREEN_HEIGHT/2-BORDER_WIDTH/2+1))
+
+    # TOP
+    game_indicator = Indicator(screen,
+    (0+BORDER_WIDTH/2,
+    0+BORDER_WIDTH/2,
+    SCREEN_WIDTH-BORDER_WIDTH,
+    SCREEN_HEIGHT/2-BORDER_WIDTH))
+
+    # Restart
+    restart_button = Indicator(screen, (25, 150, 100, 30), (200, 190, 170), border_width=4)
+    quit_button = Indicator(screen, (25, 195, 100, 30), (200, 190, 170), border_width=4)
+
+    # Initialize game objects
+    game = Game()
+    clock = pygame.time.Clock()
+
+    # Main game loop
+    running = True
+    while running:
+        handle_events(game)
+        update_game_state(game)
+        render(game)
 
 if __name__ == '__main__':
     main()

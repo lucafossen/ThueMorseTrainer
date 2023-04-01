@@ -1,6 +1,8 @@
 import pygame
 pygame.mixer.quit()
 pygame.mixer.init(44100, -16, 2, 256)
+
+
 class Sound():
     def __init__(self, file, channel, channel2=None, volume=1):
         #self.channel = pygame.mixer.Channel(channel)
@@ -15,7 +17,7 @@ class Sound():
         else:
             self.channel2 = None
         self.swapped_channel = False
-    
+
     def play(self):
         if self.channel2 == None:
             self.channel.play(self.sound)

@@ -1,4 +1,4 @@
-import inverting_pattern
+import thue_pattern
 from sound import Sound
 # TODO: is this needed?
 # from os import listdir
@@ -9,6 +9,9 @@ import time
 
 
 class Game:
+    """Back end game class. Handles all game logic and state.
+    Does not handle any rendering or user input.
+    """
     global left_sound, right_sound
     global fail_left, fail_right
     global restart_volume, restart_sound
@@ -18,7 +21,7 @@ class Game:
     right_sound = Sound("r.wav", 1)
     fail_left = Sound("fail_left.wav", 4)
     fail_right = Sound("fail_right.wav", 4)
-    
+
     #TODO: find way of doing this that sounds good when approaching every milestone
     # milestone_warnings = [Sound("milestone_warnings/soon.wav", 6),
     #                     Sound("milestone_warnings/sooner.wav", 6),
@@ -39,7 +42,7 @@ class Game:
     global highscore
 
     def __init__(self, lost=False):
-        self.steps_since_launch = steps_since_launch        
+        self.steps_since_launch = steps_since_launch
         self.pattern_pos = 0
         self.milestone_pos = 0
         self.won = False
@@ -55,7 +58,7 @@ class Game:
 
         # Start and finish times for individual games
         self.start_time = None
-        self.game_time = None # finish_time - 
+        self.game_time = None # finish_time -
 
     def get_highscore(self, read=False):
         if read:
@@ -69,7 +72,7 @@ class Game:
                     return init_highscore["score"]
         else:
             return(self.highscore)
-    
+
     #Variables important for writing to data.json
     global init_highscore
     init_highscore = {
@@ -79,7 +82,7 @@ class Game:
                         }
     global high_path
     high_path = "data.json"
-    
+
     def update_highscore(self, time="Error loading time"):
         # if score == None:
         #     score = self.pattern_pos
@@ -97,7 +100,7 @@ class Game:
                     json.dump(out_dict, out_file, ensure_ascii=False, indent=4)
                 out_file.close()
 
-        # If opening the file for reading fails, create one   
+        # If opening the file for reading fails, create one
         # except:
         #     with open(high_path, "w", encoding="utf-8") as out_file:
         #             # highscore = init_highscore["score"]
@@ -112,7 +115,7 @@ class Game:
         self.started = True
         self.in_progress = True
         self.start_time = time.time()
-        
+
         #steps_since_launch = False
 
     def process_action(self, action):
@@ -123,9 +126,9 @@ class Game:
             # If the game has just begun
             if self.pattern_pos == 0:
                 self.start_game(action)
-            
+
             # If the action is correct
-            if {"right":1, "left":0}[action] == inverting_pattern.evaluate_move(self.pattern_pos, self.starting_action):
+            if {"right":1, "left":0}[action] == thue_pattern.evaluate_move(self.pattern_pos, self.starting_action):
                 self.pattern_pos += 1
                 # Set volumes of regular beeps lower if milestone sound is also supposed to play
                 if ((self.pattern_pos) & (self.pattern_pos-1) == 0):
@@ -140,7 +143,7 @@ class Game:
                 if action == "left":
                     left_sound.play()
                 self.update_highscore(self.game_time)
-                
+
                 #print(self.pattern_pos, self.highscore)
                 if self.pattern_pos > self.highscore:
                     #print(f"{self.pattern_pos} is bigger than {self.highscore}, which should be equal to {self.get_highscore()}")
@@ -148,14 +151,14 @@ class Game:
                     self.update_highscore(self.game_time)
 
                     self.highscore = self.pattern_pos
-                    
+
                     #print(f"{self.pattern_pos},{self.highscore},{self.get_highscore()} should all be equal now")
-                 
+
 
                 # If the player has reached the end of the pattern
                 # if self.pattern_pos == len(self.pattern):
                 #     self.won = True
-                    #self.pattern = inverting_pattern.add_inverse(self.pattern)
+                    #self.pattern = thue_pattern.add_inverse(self.pattern)
                     #print("generated new pattern")
                 # If the player has reached a milestone (power of 2)
                 if ((self.pattern_pos) & (self.pattern_pos-1) == 0):# and self.pattern_pos != 0):
@@ -163,9 +166,9 @@ class Game:
                     self.milestone_sounds[self.milestone_pos].play()
                     if self.milestone_pos < 13:
                         self.milestone_pos += 1
-                
+
                 self.correct = True
-                
+
             # If the action is incorrect
             else:
                 self.set_time()
@@ -177,23 +180,23 @@ class Game:
 
         # TODO: why is this here?
         # return self.highscore  #(correct, self.milestone_pos, self.won, self.lost, milestone)
-    
+
     def fade_restart_volume(self):
         if self.dynamic_rvol < 0.001:
             self.dynamic_rvol = 0
         else:
             self.dynamic_rvol *= 0.99
         restart_sound.sound.set_volume(restart_volume*self.dynamic_rvol)
-    
+
     def quit(self):
         self.update_highscore(self.game_time)
-    
+
     def set_time(self):
         self.game_time = float(time.time() - self.start_time)
 
     # TODO: is this needed?
     # def get_time(self):
     #     if self.start_time != None and self.finish_time != None:
-    #         return 
+    #         return
         # else:
         #     return 1231
