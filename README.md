@@ -6,6 +6,7 @@
 ### UX:
 
  * [x] Arrows on each pad for readability
+ * [] Make buttons respond visually to mouse down presses
  * [] Make power milestones more obvious when reached
    * [x] unique colors
    * [] score text bounces/dilates

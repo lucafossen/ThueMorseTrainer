@@ -47,6 +47,7 @@ class Game:
         self.highscore = self.get_highscore(high_path)
         self.starting_action = None
         self.started = False
+        self.in_progress = False
 
         self.dynamic_rvol = 1
         self.which_channel = True
@@ -109,6 +110,7 @@ class Game:
         self.starting_action = starting_action
 
         self.started = True
+        self.in_progress = True
         self.start_time = time.time()
         
         #steps_since_launch = False
@@ -169,6 +171,7 @@ class Game:
                 self.set_time()
                 self.correct = False
                 self.lost = True
+                self.in_progress = False
                 self.update_highscore(self.game_time)
                 {"left":fail_left, "right":fail_right}[action].play()
 

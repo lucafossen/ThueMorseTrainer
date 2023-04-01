@@ -1,4 +1,4 @@
-# Algorithm for mirroring/inverting pattern
+# Algorithm for thue-morse sequence
 # 1: input binary pattern (eg. True, False, False, True)
 # 2: append inverse of stored value to itself (eg "1, 0, 0, 1" becomes "1, 0, 0, 1, 0, 1, 1, 0")
 # 3: if iteration number is met: output stored value
@@ -25,7 +25,7 @@ def add_inverse(pat=[False], iterations=1):
         pat_ = [pat]
     else:
         pat_ = pat
-    
+
     # Break condition
     if iterations == 0:
         return pat_
@@ -43,10 +43,10 @@ if __name__ == "__main__":
     f = pygame.mixer.Sound("sound/l.wav")
     t = pygame.mixer.Sound("sound/r.wav")
     getready = pygame.mixer.Sound("sound/getready.wav")
-    
+
     pattern = add_inverse(True, 10)
     interval = 0.23
-    
+
     count = 0
     for boolean in pattern:
         if count == 0:
@@ -60,4 +60,3 @@ if __name__ == "__main__":
         count += 1
     # This lets the last sound finish if it is shorter than the interval
     time.sleep(interval)
-    
